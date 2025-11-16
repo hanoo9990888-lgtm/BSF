@@ -1,216 +1,104 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+const starCount = window.devicePixelRatio > 1.5 ? 200 : 120;
+const starsContainer = document.getElementById('stars');
+for (let i = 0; i < starCount; i++) {
+  const star = document.createElement('div');
+  star.style.position = 'absolute';
+  star.style.width = Math.random() * 1.8 + 'px';
+  star.style.height = star.style.width;
+  star.style.backgroundColor = 'white';
+  star.style.borderRadius = '50%';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.opacity = Math.random() * 0.8 + 0.2;
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    star.style.animation = `twinkle ${Math.random() * 8 + 4}s infinite alternate`;
+  }
+  starsContainer.appendChild(star);
 }
 
-:root {
-  --header-padding: env(safe-area-inset-top, 20px);
-  --footer-padding: env(safe-area-inset-bottom, 20px);
-}
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes twinkle {
+    0% { opacity: 0.2; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.15); }
+  }
+`;
+document.head.appendChild(style);
 
-html {
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
+const bgMusic = document.getElementById('bg-music');
+const musicToggle = document.getElementById('music-toggle');
 
-body {
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  background-size: 400% 400%;
-  animation: gradientBG 20s ease infinite;
-  min-height: 100vh;
-  font-family: 'Tajawal', system-ui, sans-serif;
-  color: white;
-  position: relative;
-  padding: var(--header-padding) 0 var(--footer-padding);
-}
+bgMusic.volume = 0.45;
+let audioStarted = false;
 
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-#stars, .mist {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.mist {
-  background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
-}
-
-header {
-  text-align: center;
-  padding: clamp(30px, 8vh, 60px) 20px;
-  position: relative;
-  z-index: 10;
-}
-
-header h1 {
-  font-size: clamp(2rem, 6vw, 3.2rem);
-  margin-bottom: 15px;
-  text-shadow: 0 3px 10px rgba(0,0,0,0.4);
-  letter-spacing: 1px;
-  font-weight: 700;
-}
-
-header p {
-  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
-  opacity: 0.95;
-  max-width: min(700px, 95vw);
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-.garden {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: min(50px, 8vw);
-  padding: 20px;
-  position: relative;
-  z-index: 10;
-  margin: 0 auto;
-  max-width: min(1200px, 95vw);
-}
-
-.flower {
-  width: clamp(90px, 22vw, 140px);
-  height: clamp(90px, 22vw, 140px);
-  position: relative;
-  cursor: pointer;
-  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
-  flex-shrink: 0;
-}
-
-.flower:hover, .flower:focus {
-  transform: scale(1.25) rotate(5deg);
-  z-index: 20;
-  outline: none;
-}
-
-/* ألوان الأزهار */
-.flower:nth-child(1) { --color: #ff9aa2; --glow: #ffb3c6; } /* شهد */
-.flower:nth-child(2) { --color: #82c0cc; --glow: #a8e6cf; } /* ملاذ */
-.flower:nth-child(3) { --color: #ffd166; --glow: #ffde7d; } /* أميرة */
-.flower:nth-child(4) { --color: #a7d9a0; --glow: #c1f0c1; } /* ريوف */
-.flower:nth-child(5) { --color: #f0d9b5; --glow: #f8e9c8; } /* الرّغد */
-
-.flower::before {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, var(--color), transparent 70%);
-  border-radius: 50%;
-  box-shadow: 0 0 25px var(--glow);
-  animation: breathe 4s infinite alternate;
-}
-
-@keyframes breathe {
-  0% { transform: scale(1); opacity: 0.9; }
-  100% { transform: scale(1.03); opacity: 1; }
-}
-
-.audio-controls {
-  text-align: center;
-  margin-top: clamp(30px, 6vh, 50px);
-  position: relative;
-  z-index: 10;
-}
-
-#music-toggle {
-  padding: 12px min(24px, 6vw);
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  border: none;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  backdrop-filter: blur(8px);
-  cursor: pointer;
-  transition: all 0.3s;
-  font-weight: bold;
-  -webkit-tap-highlight-color: transparent;
-}
-
-#music-toggle:hover, #music-toggle:focus {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.03);
-  outline: none;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.92);
-  backdrop-filter: blur(3px);
-  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
-}
-
-.modal-content {
-  background: linear-gradient(145deg, #1e1e2f, #2d2d44);
-  margin: 8% auto;
-  padding: clamp(25px, 5vh, 50px);
-  width: min(600px, 95vw);
-  border-radius: 24px;
-  text-align: center;
-  color: #f8f9fa;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-  position: relative;
-  animation: modalIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-@keyframes modalIn {
-  0% { opacity: 0; transform: translateY(20px) scale(0.97); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-#close {
-  position: absolute;
-  top: clamp(15px, 3vw, 20px);
-  left: clamp(15px, 3vw, 25px);
-  font-size: clamp(24px, 6vw, 36px);
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-#close:hover, #close:focus {
-  color: #ff9aa2;
-  outline: none;
-}
-
-#friend-name {
-  font-size: clamp(1.6rem, 5vw, 2.3rem);
-  margin: 0 0 20px;
-  background: linear-gradient(to right, #ffd166, #ff9aa2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-#message-text {
-  font-size: clamp(1.1rem, 3.8vw, 1.35rem);
-  line-height: 1.7;
-  font-weight: 400;
-  direction: rtl;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #stars *, .flower::before {
-    animation: none !important;
-    transition: none !important;
+function tryPlayAudio() {
+  if (audioStarted) return;
+  const playPromise = bgMusic.play();
+  if (playPromise !== undefined) {
+    playPromise
+      .then(() => {
+        audioStarted = true;
+        musicToggle.textContent = '🔊 إيقاف الموسيقى';
+        musicToggle.style.display = 'inline-block';
+      })
+      .catch(() => {
+        musicToggle.style.display = 'inline-block';
+      });
+  } else {
+    audioStarted = true;
+    musicToggle.style.display = 'none';
   }
 }
 
-.flower, #music-toggle, #close {
-  -webkit-tap-highlight-color: transparent;
-}
+const userGestureHandler = () => {
+  if (!audioStarted) tryPlayAudio();
+  window.removeEventListener('click', userGestureHandler);
+  window.removeEventListener('touchstart', userGestureHandler);
+  window.removeEventListener('keydown', userGestureHandler);
+};
+
+window.addEventListener('click', userGestureHandler);
+window.addEventListener('touchstart', userGestureHandler);
+window.addEventListener('keydown', userGestureHandler);
+
+musicToggle.addEventListener('click', () => {
+  if (bgMusic.paused) {
+    bgMusic.play();
+    musicToggle.textContent = '🔊 إيقاف الموسيقى';
+  } else {
+    bgMusic.pause();
+    musicToggle.textContent = '🔈 تشغيل الموسيقى';
+  }
+});
+
+document.querySelectorAll('.flower').forEach(flower => {
+  const handleClick = () => {
+    const name = flower.getAttribute('data-name');
+    const msg = flower.getAttribute('data-msg');
+    document.getElementById('friend-name').textContent = name;
+    document.getElementById('message-text').textContent = msg;
+    document.getElementById('modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+
+  flower.addEventListener('click', handleClick);
+  flower.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') handleClick();
+  });
+});
+
+const closeModal = () => {
+  document.getElementById('modal').style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+document.getElementById('close').addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('modal').style.display === 'flex') {
+    closeModal();
+  }
+});
